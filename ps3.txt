@@ -1,0 +1,10 @@
+lsusb
+#push ps3button
+#led1 light
+sudo ./sixpair
+#sudo ./sixpair xx:xx:xx:xx:xx:xx
+#code off
+sudo sixad -start &
+
+#if you want to reset sixad
+#/usr/bin/sixad --stop
