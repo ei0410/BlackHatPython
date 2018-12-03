@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import socket
 import threading
 import paramiko
 import subprocess
@@ -15,7 +16,7 @@ class Server (paramiko.ServerInterface):
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAINED_ADMINISTRATIVELY_PROHIBITED
     def check_auth_password(self, username, password):
-        if (username == 'justin') and (password == 'lovethepython'):
+        if (username == 'ei') and (password == 'lovethepython'):
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
 
@@ -35,7 +36,7 @@ except Exception, e:
 print '[+] Got a connection!'
 
 try:
-    bhSession = patamiko.Transport(client)
+    bhSession = paramiko.Transport(client)
     bhSession.add_server_key(host_key)
     server = Server()
     try:

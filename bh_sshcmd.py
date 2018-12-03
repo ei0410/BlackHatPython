@@ -15,4 +15,4 @@ def ssh_command(ip, user, passwd, command):
         print ssh_session.recv(1024)
     return 
 
-ssh_command('192.168.223.136', 'ei', 'lovethepython', 'id')
+ssh_command('192.168.', 'ei', 'lovethepython', 'id')
