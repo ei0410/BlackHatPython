@@ -5,7 +5,25 @@ import os
 import struct
 from ctypes import *
 
+import threading
+import time
+from netaddr import IPNetwork, IPAddress
+
 host = "192.168.0.100"
+
+subnet = "192.168.0.0/24"
+
+magic_message = "PYTHONRULES!"
+
+def udp_sender(subnet, magic_message):
+    time.sleep(5)
+    sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    for ip in IPNetwork(subnet):
+        try:
+            sender.sendto(magic_message, ("%s" % ip, 65212))
+        except:
+            pass
 
 class IP(Structure):
     _fields_ = [
@@ -36,6 +54,21 @@ class IP(Structure):
         except:
             self.protocol = str(self.protocol_num)
 
+class ICMP(Structure):
+    _fields_ = [
+        ("type",         c_uint8),
+        ("code",         c_uint8),
+        ("checksum",     c_uint16),
+        ("unused",       c_uint16),
+        ("next_hop_mtu", c_uint16),
+    ]
+
+    def __new__(self, socket_buffer):
+        return self.from_buffer_copy(socket_buffer)
+
+    def __init__(self, socket_buffer):
+        pass
+
 if os.name == "nt":
     socket_protocol = socket.IPPROTO_IP
 else:
@@ -49,13 +82,27 @@ sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 if os.name == "nt":
     sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
+t = threading.Thread(target=udp_sender, args=(subnet, magic_message))
+t.start()
+
 try:
     while True:
+        #print "Protocol: %s %s -> %s" % (ip_header.protocol, ip_header.src_address, ip_header.dst_address)
         raw_buffer = sniffer.recvfrom(65565)[0]
 
         ip_header = IP(raw_buffer[0:20])
 
-        print "Protocol: %s %s -> %s" % (ip_header.protocol, ip_header.src_address, ip_header.dst_address)
+        if ip_header.protocol == "ICMP":
+            offset = ip_header.ihl * 4
+            buf = raw_buffer[offset:offset + sizeof(ICMP)]
+
+            icmp_header = ICMP(buf)
+
+            #print "ICMP -> Type: %d Code: %d" % (icmp_header.type, icmp_header.code)
+            if icmp_header.code == 3 and icmp_header.type == 3:
+                if IPAddress(ip_header.src_address) in IPNetwork(subnet):
+                    if raw_buffer[len(raw_buffer)-len(magic_message):] == magic_message:
+                        print "Host Up: %s" % ip_header.src_address
 
 except KeyboardInterrupt:
     if os.name == "nt":
