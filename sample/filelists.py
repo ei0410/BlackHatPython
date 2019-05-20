@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: UTF-8
+# -*- coding: UTF-8 -*-
 
 import os
 
@@ -7,26 +7,23 @@ inpath = "."
 outpath = "intglist.txt"
 
 files = os.listdir(inpath)
-txtlists = []
 
-lists = []
+#input .txt
+txtlists = []
 
 for a in files:
     if a[-9:] == "_list.txt":
         txtlists.append(a)
 
-#print txtlists
-
-names = []
 d = {}
 
 for txtlist in txtlists:
     data = open(txtlist, "r")
     lines = data.readlines()
 
+    #read .pdf in .txt
     for line in lines:
         if line[-6:] == ".pdf\r\n":
-            #lists.append(line)
             d.setdefault(line, 0)
 
             if line in d:
@@ -34,17 +31,27 @@ for txtlist in txtlists:
 
     data.close()
 
-output = open(outpath, "w")
-
+#make integrated lists
 key = d.keys()
 value = d.values()
-s = 0
+count = 0
+
+lists = []
 
 for i in range(len(d)):
-    output.write(str(key[i][:-2]) + ',' + str(value[i]) + '\r\n')
-    s += value[i]
+    lists.append(str(key[i][:-2]) + ',' + str(value[i]) + '\r\n')
+    count += value[i]
 
+lists.sort()
+
+#output intglist.txt
+output = open(outpath, "w")
+
+for l in lists:
+    output.write(l)
+
+#number of lists and sum of lists
 output.write("num = " + str(len(d)) + '\r\n')
-output.write("sum = " + str(s))
+output.write("sum = " + str(count))
 
 output.close()

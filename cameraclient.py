@@ -5,8 +5,8 @@ import numpy
 import cv2
 
 #host = "192.168.x.y"
-host = "192.168.11.2"
-port = 10000
+host = "192.168.11.12"
+port = 10001
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((host, port))
