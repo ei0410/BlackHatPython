@@ -43,7 +43,7 @@ def dir_bruter(word_queue, extensions=None):
         if "." not in attempt:
             attempt_list.append("/%s/" % attempt)
         else:
-            attempt_list.append("/%s/" % attempt)
+            attempt_list.append("/%s" % attempt)
 
         if extensions:
             for extension in extensions:
